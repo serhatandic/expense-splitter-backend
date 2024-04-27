@@ -9,9 +9,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function fetchExpenseGroups(owner_mail) {
 	const { data, error } = await supabase
-		.from('expense-tracker')
-		.select('expense_group')
-		.eq('group_owner', owner_mail);
+		.from('expense_groups')
+		.select('name')
+		.eq('creator', owner_mail);
 	return { data, error };
 }
 
