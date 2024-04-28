@@ -7,14 +7,109 @@ const SUPABASE_KEY =
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function fetchExpenseGroups(owner_mail) {
+async function fetchExpenseGroups(user_mail) {
+	// check participants filed in expense_groups table, if user_mail is in the list, return the data
+	// format is
+	/*
+		[
+  {
+    "name": "serhat",
+    "email": "a@b.com"
+  },
+  {
+    "name": "hikmet",
+    "email": "b@c.com"
+  },
+  {
+    "name": "barış",
+    "email": "c@d.com"
+  },
+  {
+    "name": "ismail",
+    "email": "d@e.com"
+  },
+  {
+    "name": "furkan",
+    "email": "e@f.com"
+  }
+]
+	*/
+	const { data, error } = await supabase.from('expense_groups').select('*');
+	let new_data = [];
+	data.forEach((group) => {
+		Object.values(group.participants).forEach((participant) => {
+			if (participant.email === user_mail) {
+				new_data.push(group);
+			}
+		});
+	});
+	return { data: new_data, error };
+}
+
+async function createExpenseGroup(
+	owner_mail,
+	name,
+	participants,
+	creation_date
+) {
 	const { data, error } = await supabase
 		.from('expense_groups')
-		.select('name')
-		.eq('creator', owner_mail);
+		.insert([{ creator: owner_mail, name, participants, creation_date }]);
 	return { data, error };
 }
 
+async function fetchExpensesByGroup(expense_group) {
+	const { data, error } = await supabase
+		.from('expenses')
+		.select('*')
+		.eq('expense_group', expense_group);
+	return { data, error };
+}
+
+async function fetchExpensesByUser(user_mail) {
+	const { data, error } = await supabase
+		.from('expenses')
+		.select('*')
+		.eq('paid_by', user_mail);
+	return { data, error };
+}
+
+async function createExpense(
+	expense_group,
+	expense,
+	price,
+	group_owner,
+	paid_by,
+	date
+) {
+	const { data, error } = await supabase
+		.from('expenses')
+		.insert([
+			{ expense_group, expense, price, group_owner, paid_by, date },
+		]);
+	return { data, error };
+}
+
+async function fetchExpenseGroupDetails(expense_group) {
+	const { data, error } = await supabase
+		.from('expense_groups')
+		.select('*')
+		.eq('name', expense_group);
+	return { data, error };
+}
+
+async function fetchExpenses() {
+	const { data, error } = await supabase.from('expenses').select('*');
+	return { data, error };
+}
 // Additional functions for other data interactions
 
-module.exports = { fetchExpenseGroups };
+module.exports = {
+	fetchExpenseGroups,
+	createExpenseGroup,
+	fetchExpenses,
+	createExpense,
+	fetchExpenseGroupDetails,
+	fetchExpensesByGroup,
+	fetchExpensesByUser,
+};

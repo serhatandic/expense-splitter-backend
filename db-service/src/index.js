@@ -4,8 +4,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 const dataRoutes = require('./routes');
 app.use(cors());
-
-app.use('/api', dataRoutes);
+app.use(express.json());
+app.use('/', dataRoutes);
 //allow cors
 app.listen(port, () => {
 	console.log(`Database Service running on port ${port}`);
