@@ -8,32 +8,6 @@ const SUPABASE_KEY =
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function fetchExpenseGroups(user_mail) {
-	// check participants filed in expense_groups table, if user_mail is in the list, return the data
-	// format is
-	/*
-		[
-  {
-    "name": "serhat",
-    "email": "a@b.com"
-  },
-  {
-    "name": "hikmet",
-    "email": "b@c.com"
-  },
-  {
-    "name": "barış",
-    "email": "c@d.com"
-  },
-  {
-    "name": "ismail",
-    "email": "d@e.com"
-  },
-  {
-    "name": "furkan",
-    "email": "e@f.com"
-  }
-]
-	*/
 	const { data, error } = await supabase.from('expense_groups').select('*');
 	let new_data = [];
 	data.forEach((group) => {
